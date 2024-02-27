@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 var points int
@@ -25,12 +26,21 @@ func main() {
 		return
 	}
 
-	startGame(records)
+	gameOver := make(chan bool)
+
+	go startGame(records, gameOver)
+
+	select {
+	case <-gameOver:
+		// Quiz Done
+	case <-time.After(30 * time.Second):
+		fmt.Println("Time's Up!")
+	}
 
 	fmt.Printf("%d/%d Correct", points, len(records))
 }
 
-func startGame(records [][]string) {
+func startGame(records [][]string, gameOver chan<- bool) {
 	for i, record := range records {
 
 		fmt.Printf("Question %d\n%s\n", i+1, record[0])
@@ -43,6 +53,8 @@ func startGame(records [][]string) {
 		fmt.Println(e)
 		fmt.Println("---------------")
 	}
+
+	gameOver <- true
 }
 
 func evaluateAnswer(testAnswer string, userAnswer string) string {
