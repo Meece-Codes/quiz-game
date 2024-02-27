@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -12,6 +13,9 @@ import (
 var points int
 
 func main() {
+	timeLimit := flag.Int("limit", 30, "the time limit of the quiz in seconds")
+	flag.Parse()
+
 	file, err := os.Open("problems.csv")
 	if err != nil {
 		fmt.Println("Error: ", err)
@@ -33,7 +37,7 @@ func main() {
 	select {
 	case <-gameOver:
 		// Quiz Done
-	case <-time.After(30 * time.Second):
+	case <-time.After(time.Duration(*timeLimit) * time.Second):
 		fmt.Println("Time's Up!")
 	}
 
