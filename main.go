@@ -41,13 +41,11 @@ func main() {
 }
 
 func startGame(records [][]string, gameOver chan<- bool) {
-	for i, record := range records {
+	reader := bufio.NewReader(os.Stdin)
 
+	for i, record := range records {
 		fmt.Printf("Question %d\n%s\n", i+1, record[0])
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Your Answer: ")
-		userAnswer, _ := reader.ReadString('\n')
-		userAnswer = strings.TrimSpace(userAnswer)
+		userAnswer := getUserInput("Your Answer: ", reader)
 
 		e := evaluateAnswer(record[1], userAnswer)
 		fmt.Println(e)
@@ -55,6 +53,13 @@ func startGame(records [][]string, gameOver chan<- bool) {
 	}
 
 	gameOver <- true
+}
+
+func getUserInput(prompt string, reader *bufio.Reader) string {
+	fmt.Print(prompt)
+	userAnswer, _ := reader.ReadString('\n')
+
+	return strings.TrimSpace(userAnswer)
 }
 
 func evaluateAnswer(testAnswer string, userAnswer string) string {
